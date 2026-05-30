@@ -59,16 +59,17 @@ describe('Create linked list', () => {
         expect(actual).toEqual(expected);
     });
 });
+
 describe('Get data from a linked list', () => {
+    test('Get the _head value', () => {
+        const actual = new LinkedList().head();
+        const expected = undefined;
+        expect(actual).toBe(expected);
+    });
     test('Get the tail value', () => {
         const actual = new LinkedList([1, 2, 3]).tail();
         const expected = 3;
         expect(actual).toEqual(expected);
-    });
-    test('Get the _head value', () => {
-        const actual = new LinkedList([1, 2, 3]).head();
-        const expected = 1;
-        expect(actual).toBe(expected);
     });
     test('Get the size of a linked list with 3 nodes', () => {
         const actual = new LinkedList([1, 2, 3]).size();
@@ -105,61 +106,98 @@ describe('Get data from a linked list', () => {
         const expected = false;
         expect(actual).toEqual(expected);
     });
-})
+});
 
-test('Append a single value', () => {
-    const input = {a: 5};
-    const actual = new LinkedList();
-    actual.append(input);
-    const expected = {_head: 
-        {value: {a: 5}, nextNode: null}
-    };
-    expect(actual).toEqual(expected);
+describe('Append or Link at the End of the list', () => {
+    test('Append a single value', () => {
+        const input = {a: 5};
+        const actual = new LinkedList();
+        actual.append(input);
+        const expected = {_head: 
+            {value: {a: 5}, nextNode: null}
+        };
+        expect(actual).toEqual(expected);
+    });
+    test('Append each element of an array', () => {
+        const input = [0, 1, 2];
+        const actual = new LinkedList();
+        actual.appendEach(input);
+        const expected = list012;
+        expect(actual).toEqual(expected);
+    });
+    test('Link a list at the end (tail position)', () => {
+        const input = new LinkedList(['a', 'b']);
+        const actual = new LinkedList([1, 2]);
+        actual.linkListAtTail(input);
+        const expected = list12ab;
+        expect(actual).toEqual(expected);
+    });
 });
-test('Append each element of an array', () => {
-    const input = [0, 1, 2];
-    const actual = new LinkedList();
-    actual.appendEach(input);
-    const expected = list012;
-    expect(actual).toEqual(expected);
-});
-test('Prepend a single value', () => {
-    const input = 'New head';
-    const actual = new LinkedList('Old head');
-    actual.prepend(input);
-    const expected = {
-        _head: {
-            value: 'New head', nextNode: {
-                value: 'Old head', nextNode: null
+
+describe('Prepend or Link at the Start of the list', () => {
+    test('Prepend a single value', () => {
+        const input = 'New head';
+        const actual = new LinkedList('Old head');
+        actual.prepend(input);
+        const expected = {
+            _head: {
+                value: 'New head', nextNode: {
+                    value: 'Old head', nextNode: null
+                }
             }
-        }
-    };
-    expect(actual).toEqual(expected);
-});
-test('Link a list at the end (tail position)', () => {
-    const input = new LinkedList(['a', 'b']);
-    const actual = new LinkedList([1, 2]);
-    actual.linkListAtTail(input);
-    const expected = list12ab;
-    expect(actual).toEqual(expected);
-});
-test('Link a list at the start (head position)', () => {
-    const input = new LinkedList([1, 2]);
-    const actual = new LinkedList(['a', 'b']);
-    actual.linkListAtHead(input);
-    const expected = list12ab;
-    expect(actual).toEqual(expected);
-});
-test('Delete last node from list', () => {
-    const actual = new LinkedList(['popped', 0, 1, 2]);
-    const popped = actual.pop();
-    const expected = list012;
-    expect(actual).toEqual(expected);
-    expect(popped).toEqual('popped');
+        };
+        expect(actual).toEqual(expected);
+    });
+    test('Link a list at the start (head position)', () => {
+        const input = new LinkedList([1, 2]);
+        const actual = new LinkedList(['a', 'b']);
+        actual.linkListAtHead(input);
+        const expected = list12ab;
+        expect(actual).toEqual(expected);
+    });
 });
 
+describe('Delete a node from a list', () => {
+    test('Delete last node from list', () => {
+        const actual = new LinkedList(['popped', 0, 1, 2]);
+        const popped = actual.pop();
+        const expected = list012;
+        expect(actual).toEqual(expected);
+        expect(popped).toEqual('popped');
+    });
+    test('Remove node at index', () => {
+        const input = 0;
+        const actual = new LinkedList([5, 0, 1, 2]);
+        actual.removeAt(input);
+        const expected = list012;
+        expect(actual).toEqual(expected);
+    });
+});
 
+describe('Insert at INDEX', () => {
+    test('Insert single value at', () => {
+        const index = 2;
+        const values = 2;
+        const actual = new LinkedList([0, 1]);
+        actual.insertAt(index, values);
+        const expected = list012;
+        expect(actual).toEqual(expected);
+    });
+    test('Insert many values at', () => {
+        const index = 0;
+        const values = [0, 1];
+        const actual = new LinkedList([2]);
+        actual.insertAt(index, values);
+        const expected = list012;
+        expect(actual).toEqual(expected);
+    });
+    test('Link a list at', () => {
+        const index = 1;
+        const list = new LinkedList([1, 2]);
+        const actual = new LinkedList(0);
+        actual.linkListAt(index, list);
+        const expected = list012;
+        expect(actual).toEqual(expected);
+    });
+});
 
-
-// console.log('Expected: ', expected);
-// console.log('Actual: ', actual);

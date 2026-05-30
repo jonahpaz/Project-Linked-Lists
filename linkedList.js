@@ -26,6 +26,20 @@ export default class LinkedList {
         }
         return lastNode;
     }
+    static #at(index, list) {
+        if (list._head === null) return undefined;
+        if (index < 0) {
+            index += list.size();
+            if (index < 0) return undefined;
+        }
+        let i = 0;
+        let node = list._head;
+        while (i < index && node.nextNode !== null) {
+            node = node.nextNode;
+            i++
+        }
+        return i === index ? node : undefined;
+    }
     static #linkAtTail(list, newTail) {
         if (list._head === null) {
             list._head = newTail;
@@ -37,28 +51,36 @@ export default class LinkedList {
         }
         lastNode.nextNode = newTail;
     }
-    static #linkAtIndex(list, index, insertionHead, insertionTail) {
+    static #linkAtIndex(index, list, insertionHead, insertionTail) {
         if (insertionTail === undefined) insertionTail = insertionHead;
-        if (!list._head) {
+
+        if (list._head === null) {
             list._head = insertionHead;
             return;
         }
-        if (!list._head.nextNode) {
-            const nodeAtIndex = list.at(index);
+        if (index === 0) {
             insertionTail.nextNode = list._head;
             list._head = insertionHead;
             return;
         }
-        const nodeBeforeIndex = list.at(index - 1);
+        const nodeBeforeIndex = LinkedList.#at(index - 1, list);
+        if (nodeBeforeIndex === undefined) {
+            throw new RangeError('Index should not be greater than the list size.');
+        }
         const nodeAtIndex = nodeBeforeIndex.nextNode;
         nodeBeforeIndex.nextNode = insertionHead;
         insertionTail.nextNode = nodeAtIndex;
     }
+    static #isValidIndex(index) {
+        if (index < 0) throw new RangeError('Index should be positive.');
+        if (!Number.isInteger(index)) throw new TypeError('Index should be an integer.');
+        return true;
+    }
     head() {
-        return this._head ? this._head.value : undefined;
+        return this._head === null ? undefined : this._head.value;
     }
     tail() {
-        if (!this._head) return undefined;
+        if (this._head === null) return undefined;
         const tailNode = LinkedList.#tailNode(this);
         return tailNode.value;
     }
@@ -72,18 +94,8 @@ export default class LinkedList {
         return count;
     }
     at(index) {
-        if (!this._head) return undefined;
-        if (index < 0) {
-            index += this.size();
-            if (index < 0) return undefined;
-        }
-        let i = 0;
-        let node = this._head;
-        while (i < index && node.nextNode) {
-            node = node.nextNode;
-            i++
-        }
-        return i === index ? node.value : undefined;
+        const node = LinkedList.#at(index, this);
+        return node === undefined ? undefined : node.value;
     }
     contains(value) {
         return this.findIndex(value) === -1 ? false : true;
@@ -120,7 +132,7 @@ export default class LinkedList {
         console.log('');
     }
     prepend(value) {
-        if (value === undefined || value === null ) return;
+        if (value === undefined) return;
         let newHead = LinkedList.#Node(value, this._head);
         this._head = newHead;
     }
@@ -159,19 +171,15 @@ export default class LinkedList {
         linkingNode.nextNode = oldHead;
         this._head = newHead;
     }
-    insertAt(value, index) {
-        if (value === undefined || value === null) return;
-        if (!Number.isInteger(index)) return;
-        let insertion = LinkedList.#Node(value);
-        LinkedList.#linkAtIndex(this, index, insertion);
-    }
-    linkListAt(list, index) {
-        if (!(list instanceof LinkedList)) return;
-        if (!list._head) return;
-        LinkedList.#linkAtIndex(this, index, insertion);
-    }
     insertAt(index, ...values) {
-
+        if (values.length === 0) return;
+        if (!LinkedList.#isValidIndex(index)) return;
+        const list = new LinkedList(values);
+        this.linkListAt(index, list);
+    }
+    linkListAt(index, list) {
+        const tailNode = LinkedList.#tailNode(list);
+        LinkedList.#linkAtIndex(index, this, list._head, tailNode);
     }
     pop() {
         if (this._head === null) return undefined;
@@ -180,6 +188,14 @@ export default class LinkedList {
         return firstNode.value;
     }
     removeAt(index) {
-
+        if (!LinkedList.#isValidIndex(index)) return;
+        if (this._head === null) return;
+        if (index === 0) this._head = this._head.nextNode;
+        const nodeBeforeIndex = LinkedList.#at(index - 1, this);
+        if (nodeBeforeIndex === undefined) return;
+        const nodeAtIndex = nodeBeforeIndex.nextNode;
+        if (nodeAtIndex === null) return;
+        const nodeAfterIndex = nodeAtIndex.nextNode;
+        nodeBeforeIndex.nextNode = nodeAfterIndex;
     }
 }
